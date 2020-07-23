@@ -1,26 +1,35 @@
 import io
 import os
+import sys
 
 # Imports the Google Cloud client library
 from google.cloud import vision
 from google.cloud.vision import types
 
-# Instantiates a client
-client = vision.ImageAnnotatorClient()
 
-# The name of the image file to annotate
-file_name = "/Users/shotakimura/Documents/Python/ibm/sample.jpg"
+class labelImage:
+	def __init__(self, imagePath):
+		# Instantiates a client
+		self.client = vision.ImageAnnotatorClient()
 
-# Loads the image into memory
-with io.open(file_name, 'rb') as image_file:
-    content = image_file.read()
+		# The name of the image file to annotate
+		self.imagePath = imagePath
 
-image = types.Image(content=content)
+		# Loads the image into memory
+		with io.open(imagePath, 'rb') as image_file:
+		    content = image_file.read()
 
-# Performs label detection on the image file
-response = client.label_detection(image=image)
-labels = response.label_annotations
+		self.image = types.Image(content=content)
 
+	def getLabel(self, client, image):
+		# Performs label detection on the image file
+		response = self.client.label_detection(image=image)
+		return response.label_annotations
+
+
+#run proglam
+li = labelImage(sys.argv[1])
 print('Labels:')
+labels = li.getLabel(li.client, li.image)
 for label in labels:
-    print(label.description)
+	print(label.description)
